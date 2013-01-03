@@ -45,9 +45,40 @@ require([
 
 	// Maintain application state somehow
 	var ApplicationStateManager = Backbone.Model.extend({
-		tempo: 120
+		defaults: {
+			tempo: 120
+		},
+
+		elem: {
+			body: $("body")
+		},
+
+		sequencerView: null,
+
+		initialize: function() {
+			console.log("Initialize ApplicationStateManager");
+		},
+
+		// Hot swap the sequencer view with a new sequencer
+		swapSequencerView: function(newSequencer) {
+			// Completely destroy the view
+			if (this.sequencerView) {
+				this.sequencerView.remove();
+				this.sequencerView = null;
+			}
+			// Create new sequencer view
+			this.sequencerView = new SequencerView({
+				model: newSequencer
+			});
+
+			this.elem.body.append(this.sequencerView.render().$el);
+
+			return this; // Chain?
+		}
 
 	});
+
+	window.app = new ApplicationStateManager();
 
 	//
 	// build ui
@@ -153,11 +184,13 @@ require([
 
 	var test_sequencer = arrangement_sequencer.patterns.last().get("sequencer");
 
-	var sequencer_view = new SequencerView({
+	app.swapSequencerView(test_sequencer);
+
+	/*var sequencer_view = new SequencerView({
 		model:test_sequencer
 	});
 
-	$body.append(sequencer_view.render().$el);
+	$body.append(sequencer_view.render().$el);*/
 
 	test_sequencer.set('playing', true);
 

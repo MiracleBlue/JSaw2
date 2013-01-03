@@ -27,7 +27,7 @@ define([
 		},
 
 		initialize:function () {
-			this.model.on('change:active', _.bind(this.render, this));
+			this.listenTo(this.model, 'change:active', _.bind(this.render, this));
 			return Layout.prototype.initialize.apply(this, arguments);
 		},
 
@@ -76,18 +76,20 @@ define([
 		initialize:function (options) {
 			var self = this;
 
-			this.model.points.on("change:active", function(data) {
+			this.listenTo(this.model.points, "change:active", function(data) {
 
-			})
+			});
 
-			this.model.points.on('add', function (point) {
+			this.listenTo(this.model.points, 'add', function (point) {
 				console.log(point.get('row'), point.get('step'));
 			});
-			this.model.rows.on("add", function() {
+
+			this.listenTo(this.model.rows, "add", function() {
 				console.log(this.model);
 				this.model.rowAdded();
 				this.render();
 			}.bind(this));
+
 			return Layout.prototype.initialize.apply(this, arguments);
 		},
 
