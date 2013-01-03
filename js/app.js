@@ -53,6 +53,11 @@ require([
 			body: $("body")
 		},
 
+		audiolet: audiolet,
+		scheduler: scheduler,
+		tracks: tracks,
+		mixer: mixer,
+
 		sequencerView: null,
 
 		initialize: function() {

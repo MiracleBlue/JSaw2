@@ -46,11 +46,20 @@ define([
 
 		initialize:function (options) {
 			this.points = options.points;
+			this.context = options.context;
+
 			return Layout.prototype.initialize.apply(this, arguments);
 		},
 
 		newPattern: function(e) {
-			console.log("newPattern", e);
+			console.log("newPattern");
+
+			var newPattern = this.context.createNewPattern({
+				row: this.model,
+				instrument: this.model.instrument
+			});
+
+			console.log(newPattern);
 		},
 
 		render:function () {
@@ -113,6 +122,7 @@ define([
 				rows = this.model.rows;
 			rows.each(function (row) {
 				var view = new SequencerRow({
+					context: self.model,
 					model: row,
 					points:points.filter(function (p) {
 						return p.get('row') == row

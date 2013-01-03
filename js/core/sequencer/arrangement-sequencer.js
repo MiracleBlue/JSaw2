@@ -1,8 +1,35 @@
 define([
 	'backbone',
 	'core/sequencer/midinote',
-	'core/sequencer/pattern'
-], function (Backbone, MidiNote, Pattern) {
+	'core/sequencer/pattern',
+	'core/sequencer/sequencer'
+], function (Backbone, MidiNote, Pattern, Sequencer) {
+
+	// Rows for the sequencer
+	var Key = Backbone.Model.extend({
+
+		defaults:{
+			name:null
+		},
+
+		initialize:function () {
+			this.on('noteOn', _.bind(this.noteOn, this));
+			return Backbone.Model.prototype.initialize.apply(this, arguments);
+		},
+
+		// for now just to demo pianoroll,
+		// each key just controls each instrument in the arrangement.
+		// really, it should only control one specific instrument at a time.
+		noteOn:    function (self) {
+			var self = this;
+		}
+
+	});
+
+	// Collection of rows for sequencer
+	var Keys = Backbone.Collection.extend({
+		model:Key
+	});
 
 	var MidiNotes = Backbone.Collection.extend({
 		model: MidiNote
@@ -78,7 +105,22 @@ define([
 		},
 
 		createNewPattern: function(options) {
+			// This should replace the newPattern method in the view.
+			this.patterns.add({
+				row: options.row,
+				sequencer: new Sequencer({}, {
+					instrument:options.instrument,
+					scheduler: this.scheduler,
+					rows:     new Keys([
+						{ name:'A' },
+						{ name:'B' },
+						{ name:'D' },
+						{ name:'G' }
+					])
+				})
+			});
 
+			return this.patterns.last();
 		},
 
 		changePlaying:function (self, playing) {
