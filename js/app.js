@@ -66,6 +66,7 @@ require([
 
 		// Hot swap the sequencer view with a new sequencer
 		swapSequencerView: function(newSequencer) {
+			console.log("swapSequencerView");
 			// Completely destroy the view
 			if (this.sequencerView) {
 				this.sequencerView.remove();

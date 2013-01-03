@@ -1,51 +1,80 @@
 define([
-  'backbone'
-], function(Backbone) {
+	'backbone'
+], function (Backbone) {
 
-  var Scheduler = Backbone.Model.extend({
+	var Playback = Backbone.Model.extend({
+		defaults: {
+			state: null,
+			origin: null
+		}
+	});
 
-    defaults: {
-      bpm: 120
-    },
+	var PlaybackStore = Backbone.Collection.extend({
+		model: Playback
+	});
 
-    initialize: function(attrs, options) {
+	var Scheduler = Backbone.Model.extend({
 
-      var audiolet = this.audiolet = options.audiolet;
+		defaults:{
+			bpm:120
+		},
 
-      Backbone.Model.prototype.initialize.apply(this, arguments);
-      
-      this.set('state', {}); // Stores the playback event
+		initialize:function (attrs, options) {
 
-      this.properties();
+			var audiolet = this.audiolet = options.audiolet;
+			this.playbackStore = new PlaybackStore();
 
-    },
+			Backbone.Model.prototype.initialize.apply(this, arguments);
 
-    properties: function() {
+			this.set('state', {}); // Stores the playback event
 
-      var self = this,
-        scheduler = self.audiolet.scheduler;
+			this.properties();
 
-      self.on('change:bpm', function(self, val) {
-        scheduler.setTempo(val);
-      }); // derp
+		},
 
-    },
+		properties:function () {
 
-    play: function(args, cb, per_beat, repeat) {
-      this.set("state", this.audiolet.scheduler.play(
-        [new PSequence([args], (repeat || Infinity))],
-        (per_beat || 1) / 4,
-        cb
-      ));
-    },
-    
-    stop: function() {
-    	this.audiolet.scheduler.remove(this.get('state'));
-    	this.set('state', {});
-    }
+			var self = this,
+				scheduler = self.audiolet.scheduler;
 
-  });
+			self.on('change:bpm', function (self, val) {
+				scheduler.setTempo(val);
+			}); // derp
 
-  return Scheduler;
+		},
+
+		play:function (args, options) {
+			this.playbackStore.add({
+				state: this.audiolet.scheduler.play(
+					[new PSequence([args], (options.repeat || Infinity))],
+					(options.per_beat || 1) / 4,
+					options.callback
+				),
+				origin: options.origin
+			});
+
+			console.log("playbackStore", this.playbackStore);
+
+			/*this.set("state", this.audiolet.scheduler.play(
+				[new PSequence([args], (repeat || Infinity))],
+				(per_beat || 1) / 4,
+				cb
+			));*/
+		},
+
+		stop:function () {
+			//this.audiolet.scheduler.remove(this.get('state'));
+			var self = this;
+			this.playbackStore.each(function(item){
+				self.audiolet.scheduler.remove(item.get("state"));
+			});
+
+			console.log("stop playbackStore", this.playbackStore);
+			//this.set('state', {});
+		}
+
+	});
+
+	return Scheduler;
 
 });

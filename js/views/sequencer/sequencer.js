@@ -73,6 +73,10 @@ define([
 		className:'sequencer',
 		template: Handlebars.compile(tmpl),
 
+		events: {
+			"click .playback-toggle": "playbackToggle"
+		},
+
 		initialize:function (options) {
 			var self = this;
 
@@ -90,7 +94,23 @@ define([
 				this.render();
 			}.bind(this));
 
+			this.listenTo(this.model, "change:playing", function(context, data) {
+				var btn = self.$el.find(".playback-toggle");
+				if (data) {
+					btn.html("Stop");
+				}
+				else {
+					btn.html("Play");
+				}
+				console.log("change:playing", data);
+			});
+
 			return Layout.prototype.initialize.apply(this, arguments);
+		},
+
+		playbackToggle: function() {
+			console.log("playbackToggle");
+			this.model.set("playing", !this.model.get("playing"));
 		},
 
 		/*serialize:function () {

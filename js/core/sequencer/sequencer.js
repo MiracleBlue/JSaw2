@@ -80,16 +80,26 @@ define([
 			console.log("sequencer row added");
 		},
 
+		// Plays the scheduler passing this callback
 		changePlaying:function (self, playing) {
 			var self = this,
 				steps = this.get('steps'),
 				scheduler = this.scheduler;
-			scheduler.play([], function () {
-				var step = self.get('step'),
-					reset = step == self.get('steps') - 1,
-					next = reset ? 0 : step + 1;
-				self.set('step', next);
-			});
+
+			if (playing) {
+				scheduler.play([], {
+					callback: function () {
+						var step = self.get('step'),
+							reset = step == self.get('steps') - 1,
+							next = reset ? 0 : step + 1;
+						self.set('step', next);
+					},
+					origin: self
+				});
+			}
+			else {
+				scheduler.stop();
+			}
 		},
 
 		changeStep:function (self, step) {

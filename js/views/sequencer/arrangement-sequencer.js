@@ -46,11 +46,13 @@ define([
 
 		initialize:function (options) {
 			this.points = options.points;
+			// Context is the main arrangement-sequencer model
 			this.context = options.context;
 
 			return Layout.prototype.initialize.apply(this, arguments);
 		},
 
+		// Offload to the createNewPattern method in the model
 		newPattern: function(e) {
 			console.log("newPattern");
 
@@ -60,6 +62,9 @@ define([
 			});
 
 			console.log(newPattern);
+
+			// This is where we replace the sequencer view, for testing
+			app.swapSequencerView(newPattern.get("sequencer"));
 		},
 
 		render:function () {
